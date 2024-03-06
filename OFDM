@@ -1,0 +1,32 @@
+clc; close all;
+% input sequences
+x=randi([0 1],1,6400); snr=0:30; biterror=[];
+%modulation 
+y=qammod(x,16);
+%parallel 
+p=reshape(y,80,80);
+%ifft
+q=ifft(p,80);
+%series
+s=reshape(q,1,6400);
+%cyclic prefix
+a=[s(6001:6400) s]
+be=[];
+for j=0:1:30
+n=awgn(a,j,'measured');
+m=n(401:end);
+p11=reshape(m,80,80);
+q11=fft(p11,80); 
+s11=reshape(q11,1,6400);
+
+y11=qamdemod(s11,16);
+
+[num1,e1]=symerr(y11,x);
+be=[be e1];
+end
+biterror=be;
+
+semilogy(snr, biterror,'*-k','linewidth',2);hold on;
+
+xlabel('SNR(dB)');ylabel('BER');title('SNR VS BER PLOT');
+legend('16qam');
