@@ -1,0 +1,19 @@
+clc; clear all; close all;
+message = randi([0,1],1,1e7);
+snr = 0:2:40; mod = 2;
+modulated_bpsk_msg = pskmod(message,mod);
+h1 = 1+2j; 
+for p = 1:length(snr)
+y = awgn(h1*modulated_bpsk_msg,snr(p),'measured');
+wzf=inv(h1)*y;
+Demodulated_BPSK_msg_with_ZFE =pskdemod(wzf,mod); 
+Demodulated_BPSK_msg_without_ZFE = pskdemod(y,mod);
+ber1(p) = biterr(message,Demodulated_BPSK_msg_with_ZFE)/1e7;
+ber2(p)= biterr(message,Demodulated_BPSK_msg_without_ZFE)/1e7;
+end
+semilogy(snr,ber2)
+hold on
+semilogy(snr,ber1,'--')
+legend('BER WITHOUT ZFE','BER WITH ZFE')
+title('SNR VS BER FOR BPSK')
+xlabel('SNR');ylabel('BER');
