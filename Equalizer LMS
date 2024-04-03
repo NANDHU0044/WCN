@@ -1,0 +1,31 @@
+clc; clear all; close all;
+N = 1000;
+data = randi([0 1],1,N);
+d =2*data-1;
+order=2;
+a=[1.2728 -0.81];b=1;
+x=filter(b,a,d);
+
+U = zeros(2,1); 
+W = zeros(2,1);
+eta = 0.04;
+s=[]
+for n = 1 : N
+U(2:end) = U(1:end-1); 
+U(1) = x(n); 
+y(n) = W(:,n)'*U;
+e(n) =[ d(n) - y(n)]; 
+s=[s e(n)]
+W =[W W(:,n) + (eta .* e(n) .* U)] ; 
+
+end
+
+figure(1)
+plot(0:N,W)
+xlabel('No of iteration')
+ylabel('filter coefficients')
+figure(2)
+plot(0:N-1,(s.^2))
+
+xlabel('No of iteration')
+ylabel('mean square error')
